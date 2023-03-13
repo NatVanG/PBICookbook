@@ -12,6 +12,7 @@ This is a repo that summarize main concepts and consolidates useful resources wh
 * [Row-Level Security](RLS/RLSOverview.md)
 * [Vnet Gateway](VnetGateway/VnetGatewayOverview.md)
 * [Tenant Settings](tenant/TenantSettings.md)
+* [Tenant Settings by Scenario](tenant/TenantSettingsScenarios.md)
 * [Service Principal](ServicePrincipal/ServicePrincipal.md)
 * [Visualisation - Best Practices](Visualization/VisBestPractice.md)
 * [Pro vs Premium Decision Tree](ProvsPremium/DecisionTree.md)
