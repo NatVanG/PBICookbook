@@ -24,3 +24,4 @@ This is a repo that summarize main concepts and consolidates useful resources wh
 * [Real-time reporting](RealTime/Overview.md)
 * [Paginated Reports](PaginatedReports/Overview.md)
 * [Miscellaneous Best Practices](MiscBestPractice/Overview.md)
+* [Premium Performance Runbook](/PremiumPerformanceDebuggingRunbook/PremiumPerformanceDebuggingRunbook.md)
