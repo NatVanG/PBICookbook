@@ -44,6 +44,68 @@ SELECT
 FROM sys.columns c
 WHERE c.object_id = @Object_ID
 ```
+Once the relevant columns have been selected, the following procedure will display those columns and the relevant data
+```
+
+CREATE PROCEDURE [dyn].[usp_GetDynamicColumns]
+  
+ @cols varchar(max) 
+,@Object_ID int 
+,@KeyCol NVARCHAR(128) 
+
+AS
+
+DECLARE @SQL NVARCHAR(MAX)
+
+DECLARE @ColList NVARCHAR(MAX) = ''
+		,@ColListConvert NVARCHAR(MAX) = ''
+		,@crossapply NVARCHAR(MAX)
+		,@tablename NVARCHAR(128)
+		,@schemaname NVARCHAR(128)
+		,@KeyColumnName nvarchar(128)
+
+        SELECT  @CROSSAPPLY = STRING_AGG(CAST('(CONVERT(VARCHAR(100), ' + QUOTENAME(c.name) + '), ''' + QUOTENAME(c.name) + ''')' AS nvarchar(MAX)),',
+		')
+		,@tablename = t.name
+		,@schemaname = s.name
+		,@KeyColumnName = max(quotename(case when c.column_id = @KeyCol THEN  c.name ELSE NULL END ))
+		--SELECT *
+        FROM    sys.columns c
+		INNER JOIN sys.tables t
+		ON c.[Object_Id] = t.[Object_Id]
+		INNER JOIN sys.schemas s
+		on t.schema_id = s.schema_id
+		CROSS APPLY STRING_SPLIT(@cols COLLATE SQL_Latin1_General_CP1_CI_AS,',') CParam
+        WHERE   t.object_id = @Object_ID
+		AND (c.column_id = CParam.value)
+		group by t.name
+				 ,s.name
+
+DROP TABLE IF EXISTS #UnpivotData	
+CREATE TABLE #UnpivotData (KeyColumn int
+	, [Val] NVARCHAR(MAX)
+	,[Column] NVARCHAR(MAX))
+SET @SQL = 
+'INSERT INTO #UnpivotData
+
+SELECT 
+	' + @KeyColumnName + 'AS KeyColumn,
+	Upt.[Val],
+	Upt.[Column]
+	
+FROM ' + QUOTENAME(@schemaname) + '.' + QUOTENAME(@tablename) + '
+	CROSS APPLY 
+	(VALUES 
+		' + @CROSSAPPLY + '
+	) Upt ([Val],[Column])
+'
+--print @SQL
+EXEC sp_executesql @SQL;
+
+SELECT * from #UnpivotData
+
+```
+
 # Building the report
 
 Now that the database objects are in place, we can now create the report.
